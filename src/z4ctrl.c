@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-#define SERIAL_DEVICE           "/dev/ttyusb0"
+#define SERIAL_DEVICE           "/dev/ttyUSB0"
 
 #define SERIAL_OK                0 ///< no error
 #define SERIAL_ERR              -1 ///< unknown error
@@ -25,39 +25,40 @@
 
 #define READ_POWER_STATUS       "CR0\r"
 #define READ_INPUT_MODE         "CR1\r"
-#define READ_LAMP_TIME          "CR3\r"
+#define READ_LAMP_HOURS         "CR3\r"
 #define READ_TEMP_SENSORS       "CR6\r"
 
 #define POWER_ON                "C00\r"
 #define POWER_OFF               "C01\r"
 
-#define SIZE_NORMAL             "C0D\r"
-#define SIZE_FULL               "C0E\r"
-#define SIZE_ZOOM               "C2C\r"
-#define SIZE_WIDE1              "C2D\r"
-#define SIZE_WIDE2              "C2E\r"
-#define SIZE_FULL_THRU          "C65\r"
-#define SIZE_NORMAL_THRU        "C66\r"
+#define SCALE_NORMAL            "C0D\r"
+#define SCALE_FULL              "C0E\r"
+#define SCALE_ZOOM              "C2C\r"
+#define SCALE_WIDE_1            "C2D\r"
+#define SCALE_WIDE_2            "C2E\r"
+#define SCALE_CAPTION           "C63\r"
+#define SCALE_FULL_THROUGH      "C65\r"
+#define SCALE_NORMAL_THROUGH    "C66\r"
 
-#define LAMP_AUTO1              "C72\r"
-#define LAMP_AUTO2              "C73\r"
+#define LAMP_AUTO_1             "C72\r"
+#define LAMP_AUTO_2             "C73\r"
 #define LAMP_NORMAL             "C74\r"
-#define LAMP_ECO                "C75\r"
+#define LAMP_ECONOMY            "C75\r"
 
 #define INPUT_COMPOSIT          "C23\r"
 #define INPUT_SVIDEO            "C24\r"
-#define INPUT_COMPONENT1        "C25\r"
-#define INPUT_COMPONENT2        "C26\r"
+#define INPUT_COMPONENT_1       "C25\r"
+#define INPUT_COMPONENT_2       "C26\r"
 #define INPUT_VGA               "C50\r"
 #define INPUT_HDMI              "C53\r"
 
 #define COLOR_LIVING            "C39\r"
-#define COLOR_CREATIVE_CINEMA   "C3A\r"
-#define COLOR_PURE_CINEMA       "C3B\r"
-#define COLOR_USER1             "C3C\r"
-#define COLOR_USER2             "C3D\r"
-#define COLOR_USER3             "C3E\r"
-#define COLOR_USER4             "C3F\r"
+#define COLOR_CREATIVE          "C3A\r"
+#define COLOR_CINEMA            "C3B\r"
+#define COLOR_USER_1            "C3C\r"
+#define COLOR_USER_2            "C3D\r"
+#define COLOR_USER_3            "C3E\r"
+#define COLOR_USER_4            "C3F\r"
 #define COLOR_VIVID             "C40\r"
 #define COLOR_DYNAMIC           "C41\r"
 #define COLOR_POWERFUL          "C42\r"
@@ -272,7 +273,7 @@ int
 main(int argc, char **argv) {
 	int err = 0;
 
-   if ((argc==1) || ((argc>1) && (!strcmp(argv[1], "--help")))) {
+   if ((argc==1) || ((argc>1) && (!strcmp(argv[1], "help")))) {
 		puts("");
 		puts("control client for Sanyo PLV-Z4 projector " VERSION " <clemens@1541.org>");
 		puts("");
@@ -281,12 +282,12 @@ main(int argc, char **argv) {
 		puts("POSSIBLE COMMANDS:");
 		puts("");
 		puts("\tC??     ... send generic 3 byte command to the projector");
-		puts("\tstatus  ... read <power>, <input>, <lamp> or <input> status");
-		puts("\tpower   ... power the projector <on> or <off>");
-		puts("\tinput   ... set video source to <video>, <s-video>, <comp1>, <comp2>, <vga> or <hdmi>");
-		puts("\tscreen  ...                                  ");
-		puts("\tlamp    ...                                  ");
-		puts("\tcolor   ...                                  ");
+		puts("\tstatus  ... read power status, video input, lamp usage or temperature sensors");
+		puts("\tpower   ... power the projector on or off");
+		puts("\tinput   ... select video source");
+		puts("\tscaler  ... set image scaler mode");
+		puts("\tlamp    ... set lamp mode");
+		puts("\tcolor   ... set color mode");
 		puts("");
 		puts("RETURN CODES:");
 		puts("");
@@ -303,12 +304,15 @@ main(int argc, char **argv) {
 		char cmd[5];
 
 		snprintf(cmd, 5, "%3s\r", argv[1]);
-		err = ProcessCommand(cmd);
+		if (!(err = ProcessCommand(cmd))) {
+			printf("response: %s\n", response);
+			exit(0);
+		}
 	}
 
-   if (!strcmp(argv[1], "status")) {
+	if (!strcmp(argv[1], "status")) {
 		if ((argc<3) || (!strcmp(argv[2], "help"))) {
-			puts("possible status read commands are:");
+			puts("possible status read arguments are:");
 			puts("");
 			puts("\tpower ... return current power status");
 			puts("\tinput ... return selected input");
@@ -321,17 +325,17 @@ main(int argc, char **argv) {
 				char *status = NULL;
 
 				switch (atoi((char *)response)) {
-					case 00: status = "Power ON";                                              break;
-					case 80: status = "Standby";                                               break;
-					case 40: status = "Processing countdown";                                  break;
-					case 20: status = "Processing cooling down";                               break;
-					case 10: status = "Power failure";                                         break;
-					case 28: status = "Processing cooling down due to abnormal temperature";   break;
-					case 88: status = "Standby due to abnormal temperature or door failure";   break;
-					case 24: status = "Processing power save / Cooling down";                  break;
-					case 04: status = "Power save";                                            break;
-					case 21: status = "Processing cooling down after OFF due to lamp failure"; break;
-					case 81: status = "Standby after cooling down due to lamp failure";        break;
+					case 00: status = "power on";                                             break;
+					case 80: status = "stand-by";                                             break;
+					case 40: status = "processing countdown";                                 break;
+					case 20: status = "processing cooling down";                              break;
+					case 10: status = "power failure";                                        break;
+					case 28: status = "processing cooling down due to abnormal temperature";  break;
+					case 88: status = "stand-by due to abnormal temperature or door failure"; break;
+					case 24: status = "processing power save / cooling down";                 break;
+					case 04: status = "power save";                                           break;
+					case 21: status = "processing cooling down after lamp failure";           break;
+					case 81: status = "stand-by after cooling down due to lamp failure";      break;
 				}
 
 				puts(status);
@@ -342,28 +346,34 @@ main(int argc, char **argv) {
 				char *input = NULL;
 
 				switch (atoi((char *)response)) {
-					case 0: input = "Video";                 break;
-					case 1: input = "S-Video";               break;
-					case 2: input = "Component1";            break;
-					case 3: input = "Component2 (D4-Video)"; break;
-					case 4: input = "HDMI";                  break;
-					case 5: input = "Computer (Analog)";     break;
-					case 6: input = "Computer (Scart)";      break;
+					case 0: input = "composit";    break;
+					case 1: input = "s-video";     break;
+					case 2: input = "component 1"; break;
+					case 3: input = "component 2"; break;
+					case 4: input = "hdmi";        break;
+					case 5: input = "vga";         break;
+					case 6: input = "scart";       break;
 				}
 
 				puts(input);
 				exit(0);
 			}
 		} else if (!strcmp(argv[2], "lamp")) {
-			err = ProcessCommand(READ_LAMP_TIME);
+			if (!(err = ProcessCommand(READ_LAMP_HOURS))) {
+				printf("%i\n", atoi((char *)response));
+				exit(0);
+			}
 		} else if (!strcmp(argv[2], "temp")) {
-			err = ProcessCommand(READ_TEMP_SENSORS);
+			if (!(err = ProcessCommand(READ_TEMP_SENSORS))) {
+				printf("%s\n", response);
+				exit(0);
+			}
 		}
 	}
 
-   if (!strcmp(argv[1], "power")) {
+	if (!strcmp(argv[1], "power")) {
 		if ((argc<3) || (!strcmp(argv[2], "help"))) {
-			puts("possible power commands are:");
+			puts("possible power arguments are:");
 			puts("");
 			puts("\ton    ... switch projector on");
 			puts("\toff   ... switch projector to stand-by");
@@ -373,6 +383,129 @@ main(int argc, char **argv) {
 			err = ProcessCommand(POWER_ON);
 		} else if (!strcmp(argv[2], "off")) {
 			err = ProcessCommand(POWER_OFF);
+		}
+	}
+
+	if (!strcmp(argv[1], "input")) {
+		if ((argc<3) || (!strcmp(argv[2], "help"))) {
+			puts("possible input sources are:");
+			puts("");
+			puts("\tvideo   ... composit video");
+			puts("\ts-video ... super video");
+			puts("\tcomp1   ... component video 1");
+			puts("\tcomp2   ... component video 2");
+			puts("\tvga     ... vga video");
+			puts("\thdmi    ... digital hd video");
+			puts("");
+			exit(0);
+   	} else if (!strcmp(argv[2], "video")) {
+			err = ProcessCommand(INPUT_COMPOSIT);
+   	} else if (!strcmp(argv[2], "s-video")) {
+			err = ProcessCommand(INPUT_SVIDEO);
+   	} else if (!strcmp(argv[2], "comp1")) {
+			err = ProcessCommand(INPUT_COMPONENT_1);
+   	} else if (!strcmp(argv[2], "comp2")) {
+			err = ProcessCommand(INPUT_COMPONENT_2);
+   	} else if (!strcmp(argv[2], "vga")) {
+			err = ProcessCommand(INPUT_VGA);
+		} else if (!strcmp(argv[2], "hdmi")) {
+			err = ProcessCommand(INPUT_HDMI);
+		}
+	}
+
+	if (!strcmp(argv[1], "scaler")) {
+		if ((argc<3) || (!strcmp(argv[2], "help"))) {
+			puts("possible image scaler modes are:");
+			puts("");
+			puts("\toff       ... scaler off");
+			puts("\tnormal    ... scale up 4:3 to 19:9 by adding black borders");
+			puts("\tzoom      ... scale up 4:3 to 19:9 by cutting edges");
+			puts("\tfull      ... strech 4:3 to 19:9 full screen");
+			puts("\tstrech    ... strech 4:3 to 16:9 unscaled");
+			puts("\twide1     ... strech 4:3 to 19:9 but keep aspect ratio in the center");
+			puts("\twide2     ... like wide1 but strech 16:9 with black borders to 16:9 without");
+			puts("\tcaption   ... like zoom but keep subtitles on the bottom visible");
+			puts("");
+			exit(0);
+		} else if (!strcmp(argv[2], "off")) {
+			err = ProcessCommand(SCALE_NORMAL_THROUGH);
+   	} else if (!strcmp(argv[2], "normal")) {
+			err = ProcessCommand(SCALE_NORMAL);
+		} else if (!strcmp(argv[2], "zoom")) {
+			err = ProcessCommand(SCALE_ZOOM);
+		} else if (!strcmp(argv[2], "full")) {
+			err = ProcessCommand(SCALE_FULL);
+		} else if (!strcmp(argv[2], "wide1")) {
+			err = ProcessCommand(SCALE_WIDE_1);
+		} else if (!strcmp(argv[2], "wide2")) {
+			err = ProcessCommand(SCALE_WIDE_2);
+		} else if (!strcmp(argv[2], "strech")) {
+			err = ProcessCommand(SCALE_FULL_THROUGH);
+		} else if (!strcmp(argv[2], "caption")) {
+			err = ProcessCommand(SCALE_CAPTION);
+		}
+	}
+
+	if (!strcmp(argv[1], "lamp")) {
+		if ((argc<3) || (!strcmp(argv[2], "help"))) {
+			puts("possible lamp modes are:");
+			puts("");
+			puts("\tnormal ... standard brightness");
+			puts("\tauto1  ... adjusting brightness to input signal");
+			puts("\tauto2  ... like auto1 but less bright");
+			puts("\teco    ... lowest brightness and power consumption");
+			puts("");
+			exit(0);
+   	} else if (!strcmp(argv[2], "normal")) {
+			err = ProcessCommand(LAMP_NORMAL);
+		} else if (!strcmp(argv[2], "auto1")) {
+			err = ProcessCommand(LAMP_AUTO_1);
+   	} else if (!strcmp(argv[2], "auto2")) {
+			err = ProcessCommand(LAMP_AUTO_2);
+		} else if (!strcmp(argv[2], "eco")) {
+			err = ProcessCommand(LAMP_ECONOMY);
+		}
+	}
+
+	if (!strcmp(argv[1], "color")) {
+		if ((argc<3) || (!strcmp(argv[2], "help"))) {
+			puts("possible color modes are:");
+			puts("");
+			puts("\tcreative ... contrasty 3D images in a dark room");
+			puts("\tcinema   ... quiet tones of color in a dark room");
+			puts("\tnatural  ... color correction off");
+			puts("\tliving   ... sport and TV in a bright room");
+			puts("\tdynamic  ... contrasty images in a bright room");
+			puts("\tpowerful ... big screen in a bright room");
+			puts("\tvivid    ... contrasty images to maximum extent");
+			puts("\tuser1    ... user preset 1");
+			puts("\tuser2    ... user preset 2");
+			puts("\tuser3    ... user preset 3");
+			puts("\tuser4    ... user preset 4");
+			puts("");
+			exit(0);
+   	} else if (!strcmp(argv[2], "creative")) {
+			err = ProcessCommand(COLOR_CREATIVE);
+		} else if (!strcmp(argv[2], "cinema")) {
+			err = ProcessCommand(COLOR_CINEMA);
+   	} else if (!strcmp(argv[2], "natural")) {
+			err = ProcessCommand(COLOR_NATURAL);
+		} else if (!strcmp(argv[2], "living")) {
+			err = ProcessCommand(COLOR_LIVING);
+   	} else if (!strcmp(argv[2], "dynamic")) {
+			err = ProcessCommand(COLOR_DYNAMIC);
+		} else if (!strcmp(argv[2], "powerful")) {
+			err = ProcessCommand(COLOR_POWERFUL);
+   	} else if (!strcmp(argv[2], "vivid")) {
+			err = ProcessCommand(COLOR_VIVID);
+		} else if (!strcmp(argv[2], "user1")) {
+			err = ProcessCommand(COLOR_USER_1);
+   	} else if (!strcmp(argv[2], "user2")) {
+			err = ProcessCommand(COLOR_USER_2);
+		} else if (!strcmp(argv[2], "user3")) {
+			err = ProcessCommand(COLOR_USER_3);
+		} else if (!strcmp(argv[2], "user4")) {
+			err = ProcessCommand(COLOR_USER_4);
 		}
 	}
 
@@ -394,7 +527,7 @@ main(int argc, char **argv) {
 		break;
 
 		default:
-			printf("response: %s\n", response);
+			//printf("response: %s\n", response);
 		break;
 	}
 
