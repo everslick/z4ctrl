@@ -3,7 +3,7 @@ z4ctrl
 
 A command line tool to control Sanyo projectors via their serial port.
 
-USAGE: z4ctrl <<command>> <<argument>>
+USAGE: z4ctrl *command* *argument*
 
 POSSIBLE COMMANDS:
 
@@ -23,7 +23,7 @@ RETURN CODES:
 	3 ... serial write error
 	4 ... serial read timeout
 
-Omitting <<argument>> will print a list of possible arguments to the given
-<<command>>. Keep in mind that there is no command line option for the used
+Omitting *argument* will print a list of possible arguments to the given
+*command*. Keep in mind that there is no command line option for the used
 serial port. To specify a different one, you have to change the #define
 SERIAL_DEVICE "..." in z4ctrl.c and recompile.
