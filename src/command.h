@@ -4,6 +4,7 @@
 #define READ_POWER_STATUS       "CR0\r"
 #define READ_INPUT_MODE         "CR1\r"
 #define READ_LAMP_HOURS         "CR3\r"
+#define READ_PRODUCT_ID         "CR5\r"
 #define READ_TEMP_SENSORS       "CR6\r"
 
 #define POWER_ON                "C00\r"

@@ -14,7 +14,6 @@ DEFINES += -DDEBUG
 CFLAGS  += -g3 -O0
 else
 CFLAGS  += -s
-LFLAGS  += -static
 endif
 
 headers  = $(wildcard *.h)
