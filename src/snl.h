@@ -175,14 +175,14 @@ int snl_send(snl_socket_t *skt, const void *buf, unsigned int len);
 int snl_accept(snl_socket_t *skt);
 
 /**
-	\brief   Send raw data over the wire
-	\param   fd <int> socket filedescriptor
-	\param   buf <const void *> pointer to buffer start
-	\param   len <unsigned int> length of data to send
-	\return 0 on success or negative error code
+   \brief   Send raw data over the wire
+   \param   fd <int> socket filedescriptor
+   \param   buf <const void *> pointer to buffer start
+   \param   len <unsigned int> length of data to send
+   \return 0 on success or negative error code
 
-	This function is used mainly internally but, you ever want to send
-	data over the wire all by yourself, you can use this function.
+   This function is used mainly internally but, you ever want to send
+   data over the wire all by yourself, you can use this function.
 */
 int snl_write(int fd, const void *buf, unsigned int len);
 
@@ -217,7 +217,7 @@ int snl_connect(snl_socket_t *skt, const char *host, unsigned short port);
    \return  0 on success or a negative error code
 
    This function has to be used for shutting down a socket connection. The
-	socket can be reused (i.e. to connect somewhere else to).
+   socket can be reused (i.e. to connect somewhere else to).
 */
 int snl_disconnect(snl_socket_t *skt);
 
@@ -226,7 +226,7 @@ int snl_disconnect(snl_socket_t *skt);
    \param   error <int> snl error code
    \return  human readable error string
 
-	%snl_error_string() converts a SNL error code to a human readable string.
+   %snl_error_string() converts a SNL error code to a human readable string.
 */
 const char *snl_error_string(int error);
 
