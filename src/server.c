@@ -42,15 +42,19 @@ event_callback(snl_socket_t *skt) {
          info = ipaddr(skt->client_ip, skt->client_port);
          data = (char *)skt->data_buffer;
 
-         printf("%s sent %s", info, data);
+         // FIXME potential buffer overflow
+         sscanf(data, "%s %s", cmd, arg);
 
-         sscanf(data, "%s;%s", cmd, arg);
+         printf("exec z4ctrl %s %s\n", cmd, arg);
 
          if (!strcmp(cmd,  "power")) ExecPowerCommand(ret, arg);
          if (!strcmp(cmd,  "input")) ExecInputCommand(ret, arg);
          if (!strcmp(cmd, "scaler")) ExecScalerCommand(ret, arg);
          if (!strcmp(cmd,   "lamp")) ExecLampCommand(ret, arg);
          if (!strcmp(cmd,  "color")) ExecColorCommand(ret, arg);
+         if (!strcmp(cmd, "status")) ExecStatusRead(ret, arg);
+
+			printf("response: %s\n", ret);
       break;
    }
 }
