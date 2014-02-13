@@ -4,7 +4,7 @@ TARGET   = $(PROGRAM)
 
 DEFINES  = -DVERSION=\"$(VERSION)\"
 
-LFLAGS  += -L$(PREFIX)/lib
+LFLAGS  += -L$(PREFIX)/lib -pthread
 CFLAGS  += -I$(PREFIX)/include/
 
 MAKECMDGOALS ?= debug
