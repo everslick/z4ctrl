@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "serial.h"
 #include "ctrl.h"
 
 static void
@@ -20,6 +21,9 @@ HelpUsage(void) {
    puts("\tscaler  ... set image scaler mode");
    puts("\tlamp    ... set lamp mode");
    puts("\tcolor   ... set color mode");
+   puts("\tmodel   ... read model number");
+   puts("\tprobe   ... probe serial devices for connected projector and exit");
+   puts("\tserver  ... start in background and keep running as a network service");
    puts("");
    puts("RETURN CODES:");
    puts("");
@@ -29,7 +33,10 @@ HelpUsage(void) {
    puts("\t3 ... serial open failed");
    puts("\t4 ... serial write error");
    puts("\t5 ... serial read timeout");
+   puts("\t6 ... projector not connected");
    puts("");
+
+   exit(0);
 }
 
 static void
@@ -41,6 +48,8 @@ HelpStatusRead(void) {
    puts("\tlamp  ... return houres of lamp use");
    puts("\ttemp  ... return current temperaure sensor values");
    puts("");
+
+   exit(0);
 }
 
 static void
@@ -52,6 +61,8 @@ HelpLampModes(void) {
    puts("\tauto2  ... like auto1 but less bright");
    puts("\teco    ... lowest brightness and power consumption");
    puts("");
+
+   exit(0);
 }
 
 static void
@@ -61,6 +72,8 @@ HelpPowerOnOff(void) {
    puts("\ton    ... switch projector on");
    puts("\toff   ... switch projector to stand-by");
    puts("");
+
+   exit(0);
 }
 
 static void
@@ -74,6 +87,8 @@ HelpInputSource(void) {
    puts("\tvga     ... vga video");
    puts("\thdmi    ... digital hd video");
    puts("");
+
+   exit(0);
 }
 
 static void
@@ -89,6 +104,8 @@ HelpScalerMode(void) {
    puts("\twide2     ... like wide1 but strech 16:9 with black borders to 16:9 without");
    puts("\tcaption   ... like zoom but keep subtitles on the bottom visible");
    puts("");
+
+   exit(0);
 }
 
 static void
@@ -107,26 +124,60 @@ HelpColorMode(void) {
    puts("\tuser3    ... user preset 3");
    puts("\tuser4    ... user preset 4");
    puts("");
+
+   exit(0);
 }
 
 int
 main(int argc, char **argv) {
    int err = UNKNOWN_COMMAND;
-   char ret[64];
+   char ret[RETURN_STRING_SIZE];
+   unsigned int dev_number = 32;
+   char *dev_node[32];
 
    if ((argc==1) || ((argc>1) && (!strcmp(argv[1], "help")))) {
       HelpUsage();
+   }
+
+   SerialListDevices(dev_node, &dev_number);
+
+   for (int i=0; i<dev_number; i++) {
+      serial_device = dev_node[i];
+
+      if (!ReadPowerStatus(ret)) break;
+
+      serial_device = NULL;
+   }
+
+   if (!serial_device) {
+      puts("projector not connected, exiting!");
+
+      exit(NOT_CONNECTED);
+   }
+
+   if (!strcmp(argv[1], "probe")) {
+      printf("found projector on %s\n", serial_device);
+
+      exit(err);
+   }
+
+   if (!strcmp(argv[1], "server")) {
+      //ExecNetworkService();
+ 
       exit(0);
    }
 
-   if ((argc==2) && (argv[1][0]=='C')) {
+   if (argv[1][0]=='C') {
       err = ExecGenericCommand(ret, argv[1]);
+   }
+
+   if (!strcmp(argv[1], "model")) {
+      err = ReadModelNumber(ret);
    }
 
    if (!strcmp(argv[1], "status")) {
       if ((argc<3) || (!strcmp(argv[2], "help"))) {
          HelpStatusRead();
-         exit(0);
       } else {
          err = ExecStatusRead(ret, argv[2]);
       }
@@ -135,7 +186,6 @@ main(int argc, char **argv) {
    if (!strcmp(argv[1], "power")) {
       if ((argc<3) || (!strcmp(argv[2], "help"))) {
          HelpPowerOnOff();
-         exit(0);
       } else {
          err = ExecPowerCommand(ret, argv[2]);
       }
@@ -144,7 +194,6 @@ main(int argc, char **argv) {
    if (!strcmp(argv[1], "input")) {
       if ((argc<3) || (!strcmp(argv[2], "help"))) {
          HelpInputSource();
-         exit(0);
       } else {
          err = ExecInputCommand(ret, argv[2]);
       }
@@ -153,7 +202,6 @@ main(int argc, char **argv) {
    if (!strcmp(argv[1], "scaler")) {
       if ((argc<3) || (!strcmp(argv[2], "help"))) {
          HelpScalerMode();
-         exit(0);
       } else {
          err = ExecScalerCommand(ret, argv[2]);
       }   
@@ -162,7 +210,6 @@ main(int argc, char **argv) {
    if (!strcmp(argv[1], "lamp")) {
       if ((argc<3) || (!strcmp(argv[2], "help"))) {
          HelpLampModes();
-         exit(0);
       } else {
          err = ExecLampCommand(ret, argv[2]);
       }   
@@ -171,7 +218,6 @@ main(int argc, char **argv) {
    if (!strcmp(argv[1], "color")) {
       if ((argc<3) || (!strcmp(argv[2], "help"))) {
          HelpColorMode();
-         exit(0);
       } else {
          err = ExecColorCommand(ret, argv[2]);
       }   
@@ -200,7 +246,6 @@ main(int argc, char **argv) {
 
       default:
          puts(ret);
-         //printf("response: %s\n", response);
       break;
    }
 

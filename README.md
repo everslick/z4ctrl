@@ -19,9 +19,10 @@ RETURN CODES:
 
 	0 ... ok
 	1 ... unknown command
-	2 ... serial open failed
-	3 ... serial write error
-	4 ... serial read timeout
+	2 ... invalid argument
+	3 ... serial open failed
+	4 ... serial write error
+	5 ... serial read timeout
 
 Omitting *argument* will print a list of possible arguments to the given
 *command*. Keep in mind that there is no command line option for the used

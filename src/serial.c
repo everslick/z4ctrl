@@ -1,8 +1,11 @@
 #define _BSD_SOURCE // CRTSCTS
 
 #include <termios.h>
+#include <dirent.h>
 #include <string.h>
+#include <limits.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <errno.h>
 
@@ -11,6 +14,34 @@
 static int fd = -1;
 
 static struct termios settings;
+
+int
+SerialListDevices(char *device[], unsigned int *number) {
+   struct dirent **entry = NULL;
+   unsigned int count = 0;
+   char *file = NULL;
+
+   if (chdir("/dev/serial/by-path")) {
+      return (SERIAL_ERR_OPEN);
+   }
+
+   int n = scandir(".", &entry, 0, alphasort);
+
+   for (int i=0; i<n; i++) {
+      if (strcmp(".", entry[i]->d_name) && strcmp("..", entry[i]->d_name)) {
+         if ((count < *number) && (file = realpath(entry[i]->d_name, NULL))) {
+            device[count++] = file;
+         }
+      }
+      free(entry[i]);
+   }
+
+   free(entry);
+
+   *number = count;
+
+   return (SERIAL_OK);
+}
 
 int
 SerialOpen(const char *device) {

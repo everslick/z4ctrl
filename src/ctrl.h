@@ -6,11 +6,17 @@
 #define OPEN_FAILED              3
 #define WRITE_ERROR              4
 #define READ_TIMEOUT             5
+#define NOT_CONNECTED            6
+
+#define RETURN_STRING_SIZE      32
+
+extern char *serial_device;
 
 int ReadPowerStatus(char ret[]);
 int ReadInputMode(char ret[]);
 int ReadLampHours(char ret[]);
 int ReadTempSensors(char ret[]);
+int ReadModelNumber(char ret[]);
 
 int ExecStatusRead(char ret[], const char *arg);
 int ExecPowerCommand(char ret[], const char *arg);

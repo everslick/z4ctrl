@@ -1,8 +1,6 @@
 #ifndef _Z4CTRL_SERIAL_H_
 #define _Z4CTRL_SERIAL_H_
 
-#define SERIAL_DEVICE           "/dev/ttyUSB0"
-
 #define SERIAL_OK                0 ///< no error
 #define SERIAL_ERR              -1 ///< unknown error
 #define SERIAL_ERR_OPEN         -2 ///< error while opening the serial port
@@ -11,6 +9,7 @@
 #define SERIAL_ERR_INIT         -5 ///< parameter mismatch error
 #define SERIAL_ERR_TIMEOUT      -6 ///< read did not complete in time
 
+int SerialListDevices(char *device[], unsigned int *number);
 int SerialOpen(const char *device);
 int SerialInit(int baud, const char *format, int rtscts);
 int SerialClose(void);

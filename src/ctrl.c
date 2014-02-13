@@ -6,7 +6,7 @@
 #include "serial.h"
 #include "ctrl.h"
 
-static char *serial_device = SERIAL_DEVICE;
+char *serial_device = NULL;
 
 static int
 ProcessCommand(char ret[], const char *cmd) {
@@ -27,8 +27,10 @@ ProcessCommand(char ret[], const char *cmd) {
       return (WRITE_ERROR);
    }
 
-   for (int i=0; i<64; i++) {
-      if (SerialReceiveBuffer(&ret[i], &len, 5000)) {
+   memset(ret, 0, RETURN_STRING_SIZE);
+
+   for (int i=0; i<RETURN_STRING_SIZE; i++) {
+      if (SerialReceiveBuffer(&ret[i], &len, 3000)) {
          // timeout, don't try to read more bytes
          err = READ_TIMEOUT; break;
       }
@@ -121,6 +123,13 @@ ReadTempSensors(char ret[]) {
 }
 
 int
+ReadModelNumber(char ret[]) {
+   int err = ProcessCommand(ret, READ_MODEL_NUMBER);
+
+   return (err);
+}
+
+int
 ExecStatusRead(char ret[], const char *arg) {
    if (!strcmp(arg,    "power")) return (ReadPowerStatus(ret));
    if (!strcmp(arg,    "input")) return (ReadInputMode(ret));
@@ -195,7 +204,7 @@ int
 ExecGenericCommand(char ret[], const char *arg) {
    char cmd[5];
 
-   snprintf(cmd, sizeof (cmd), "%3s\r", arg);
+   snprintf(cmd, 5, "%3s\r", arg);
 
    return (ProcessCommand(ret, cmd));
 }
