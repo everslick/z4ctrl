@@ -54,7 +54,7 @@ event_callback(snl_socket_t *skt) {
          if (!strcmp(cmd,  "color")) ExecColorCommand(ret, arg);
          if (!strcmp(cmd, "status")) ExecStatusRead(ret, arg);
 
-			printf("response: %s\n", ret);
+         printf("response: %s\n", ret);
       break;
    }
 }
