@@ -14,6 +14,10 @@ POSSIBLE COMMANDS:
 	scaler  ... set image scaler mode
 	lamp    ... set lamp mode
 	color   ... set color mode
+	model   ... read model number
+	probe   ... probe serial devices for connected projector and exit
+	server  ... start in background and keep running as a network service
+
 
 RETURN CODES:
 
@@ -23,8 +27,8 @@ RETURN CODES:
 	3 ... serial open failed
 	4 ... serial write error
 	5 ... serial read timeout
+	6 ... projector not connected
 
-Omitting *argument* will print a list of possible arguments to the given
-*command*. Keep in mind that there is no command line option for the used
-serial port. To specify a different one, you have to change the #define
-SERIAL_DEVICE "..." in z4ctrl.c and recompile.
+
+Setting *argument* to *help* or omitting it will print a list of possible arguments
+to the given *command*.
