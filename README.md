@@ -30,5 +30,7 @@ RETURN CODES:
 	6 ... projector not connected
 
 
-Setting *argument* to *help* or omitting it will print a list of possible arguments
-to the given *command*.
+Setting *argument* to *help* or omitting it will print a list of possible
+arguments to the given *command*. When started in *server* mode z4ctrl will
+fork to the background an wait for UDP packets on port 1541 in the form
+"command argument" (without quotes).
