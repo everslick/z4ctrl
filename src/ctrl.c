@@ -27,9 +27,9 @@ ProcessCommand(char ret[], const char *cmd) {
       return (WRITE_ERROR);
    }
 
-   memset(ret, 0, RETURN_STRING_SIZE);
+   memset(ret, 0, STRING_SIZE);
 
-   for (int i=0; i<RETURN_STRING_SIZE; i++) {
+   for (int i=0; i<STRING_SIZE; i++) {
       if (SerialReceiveBuffer(&ret[i], &len, 3000)) {
          // timeout, don't try to read more bytes
          err = READ_TIMEOUT; break;

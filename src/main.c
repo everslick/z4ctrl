@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "server.h"
 #include "serial.h"
 #include "ctrl.h"
 
@@ -130,8 +131,8 @@ HelpColorMode(void) {
 
 int
 main(int argc, char **argv) {
+   char ret[STRING_SIZE];
    int err = UNKNOWN_COMMAND;
-   char ret[RETURN_STRING_SIZE];
    unsigned int dev_number = 32;
    char *dev_node[32];
 
@@ -162,7 +163,7 @@ main(int argc, char **argv) {
    }
 
    if (!strcmp(argv[1], "server")) {
-      //ExecNetworkService();
+      ServerNetworkStart();
  
       exit(0);
    }

@@ -8,7 +8,7 @@
 #define READ_TIMEOUT             5
 #define NOT_CONNECTED            6
 
-#define RETURN_STRING_SIZE      32
+#define STRING_SIZE             32
 
 extern char *serial_device;
 
