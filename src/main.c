@@ -1,6 +1,9 @@
-#include <stdio.h>
+#define _BSD_SOURCE // daemon()
+
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "server.h"
 #include "serial.h"
@@ -163,6 +166,8 @@ main(int argc, char **argv) {
    }
 
    if (!strcmp(argv[1], "server")) {
+      daemon(0, 0);
+
       ServerNetworkStart();
  
       exit(0);
