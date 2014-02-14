@@ -17,7 +17,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#define _POSIX_C_SOURCE	199309L // for nananosleep
+#define _POSIX_C_SOURCE   199309L // for nananosleep
 
 #include <errno.h>       // errno, EINTR
 #include <fcntl.h>       // F_GETFL, F_SETFL, fcntl()
@@ -219,7 +219,7 @@ int
 snl_write(int fd, const void *buf, unsigned int len) {
    unsigned int remaining = len;
    char *ptr = (char *)buf;
-	int written;
+   int written;
 
    while (remaining) {
       if ((written = write(fd, ptr, remaining)) == -1) {
