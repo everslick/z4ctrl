@@ -46,6 +46,8 @@ ProcessCommand(char ret[], const char *cmd) {
       }
 
       if (ret[i] == '\r') {
+         // received CR, replace by terminating \0r
+         ret[i] = '\0';
          // ret complete, end loop
          break;
       }
