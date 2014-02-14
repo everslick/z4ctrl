@@ -177,7 +177,9 @@ main(int argc, char **argv) {
    if (!strcmp(argv[1], "server")) {
       puts("starting network service ...");
 
-      daemon(0, 0);
+      if (daemon(0, 0)) {
+         puts("couldn't fork, keep running in foreground.");
+      }
 
       ServerNetworkStart();
  
