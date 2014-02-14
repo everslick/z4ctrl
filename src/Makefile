@@ -4,8 +4,8 @@ TARGET   = $(PROGRAM)
 
 DEFINES  = -DVERSION=\"$(VERSION)\"
 
-LFLAGS  += -L$(PREFIX)/lib -pthread -m64
-CFLAGS  += -I$(PREFIX)/include/ -m64
+LFLAGS  += -L$(PREFIX)/lib -pthread
+CFLAGS  += -I$(PREFIX)/include/
 
 MAKECMDGOALS ?= debug
 
@@ -13,7 +13,8 @@ ifneq ($(MAKECMDGOALS),release)
 DEFINES += -DDEBUG
 CFLAGS  += -g3 -O0
 else
-CFLAGS  += -s
+CFLAGS  += -s -m64
+LFLAGS  += -m64
 endif
 
 headers  = $(wildcard *.h)

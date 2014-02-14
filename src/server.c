@@ -1,4 +1,5 @@
 #include <string.h>
+#include <syslog.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
@@ -26,7 +27,7 @@ event_callback(snl_socket_t *skt) {
       // FIXME potential buffer overflow
       sscanf(data, "%s %s", cmd, arg);
 
-      printf("exec z4ctrl %s %s\n", cmd, arg);
+      syslog(LOG_DEBUG, "received: %s %s", cmd, arg);
 
       if (!strcmp(cmd,  "power")) ExecPowerCommand(ret, arg);
       if (!strcmp(cmd,  "input")) ExecInputCommand(ret, arg);
@@ -35,7 +36,7 @@ event_callback(snl_socket_t *skt) {
       if (!strcmp(cmd,  "color")) ExecColorCommand(ret, arg);
       if (!strcmp(cmd, "status")) ExecStatusRead(ret, arg);
 
-      printf("response: %s\n", ret);
+      syslog(LOG_DEBUG, "response: %s", ret);
    }
 }
 
@@ -45,27 +46,33 @@ ServerNetworkStart(void) {
 
    snl_init();
 
+   openlog(NULL, LOG_PID|LOG_NDELAY, LOG_USER);
+
    signal(SIGINT,  quit);
    signal(SIGQUIT, quit);
    signal(SIGHUP,  quit);
 
-   printf("starting UDP listener on port 1541.\n");
-
    server = snl_socket_new(SNL_PROTO_UDP, event_callback, NULL);
 
    if (snl_listen(server, 1541)) {
-      printf("could not start listener, exiting.\n");
+      syslog(LOG_ERR, "failed to start server.");
 
-      return (1);
+      goto cleanup;
    }
+
+   syslog(LOG_INFO, "UDP server started on port 1541.");
 
    while (!shutdown) {
       sleep(1);
    }
 
-   snl_disconnect(server);
+cleanup:
 
+   snl_disconnect(server);
    snl_socket_delete(server);
+
+   syslog(LOG_INFO, "terminating!");
+   closelog();
 
    return (0);
 }

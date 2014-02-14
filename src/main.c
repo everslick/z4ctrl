@@ -57,7 +57,7 @@ HelpStatusRead(void) {
 }
 
 static void
-HelpLampModes(void) {
+HelpLampMode(void) {
    puts("possible lamp modes are:");
    puts("");
    puts("\tnormal ... standard brightness");
@@ -139,8 +139,17 @@ main(int argc, char **argv) {
    unsigned int dev_number = 32;
    char *dev_node[32];
 
-   if ((argc==1) || ((argc>1) && (!strcmp(argv[1], "help")))) {
+   if ((argc == 1) || ((argc == 2) && (!strcmp(argv[1], "help")))) {
       HelpUsage();
+   }
+
+   if ((argc > 2) && (!strcmp(argv[1], "help"))) {
+      if (!strcmp(argv[2], "status")) HelpStatusRead();
+      if (!strcmp(argv[2],  "power")) HelpPowerOnOff();
+      if (!strcmp(argv[2],  "input")) HelpInputSource();
+      if (!strcmp(argv[2], "scaler")) HelpScalerMode();
+      if (!strcmp(argv[2],   "lamp")) HelpLampMode();
+      if (!strcmp(argv[2],  "color")) HelpColorMode();
    }
 
    SerialListDevices(dev_node, &dev_number);
@@ -159,13 +168,15 @@ main(int argc, char **argv) {
       exit(NOT_CONNECTED);
    }
 
-   if (!strcmp(argv[1], "probe")) {
-      printf("found projector on %s\n", serial_device);
+   printf("found projector on %s\n", serial_device);
 
+   if (!strcmp(argv[1], "probe")) {
       exit(err);
    }
 
    if (!strcmp(argv[1], "server")) {
+      puts("starting network service ...");
+
       daemon(0, 0);
 
       ServerNetworkStart();
@@ -173,7 +184,7 @@ main(int argc, char **argv) {
       exit(0);
    }
 
-   if (argv[1][0]=='C') {
+   if (argv[1][0] == 'C') {
       err = ExecGenericCommand(ret, argv[1]);
    }
 
@@ -215,7 +226,7 @@ main(int argc, char **argv) {
 
    if (!strcmp(argv[1], "lamp")) {
       if ((argc<3) || (!strcmp(argv[2], "help"))) {
-         HelpLampModes();
+         HelpLampMode();
       } else {
          err = ExecLampCommand(ret, argv[2]);
       }   
