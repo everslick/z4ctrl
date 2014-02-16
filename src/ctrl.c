@@ -144,7 +144,38 @@ ExecStatusRead(char ret[], const char *arg) {
 int
 ExecPowerCommand(char ret[], const char *arg) {
    if (!strcmp(arg,       "on")) return (ProcessCommand(ret, POWER_ON));
-   if (!strcmp(arg,      "off")) return (ProcessCommand(ret, POWER_OFF));
+   if (!strcmp(arg,      "off")) return (ProcessCommand(ret, POWER_OFF_QUICK));
+   if (!strcmp(arg,      "ask")) return (ProcessCommand(ret, POWER_OFF_ASK));
+
+   return (INVALID_ARGUMENT);
+}
+
+int
+ExecLogoCommand(char ret[], const char *arg) {
+   if (!strcmp(arg,      "off")) return (ProcessCommand(ret, LOGO_OFF));
+   if (!strcmp(arg,  "default")) return (ProcessCommand(ret, LOGO_DEFAULT));
+   if (!strcmp(arg,     "user")) return (ProcessCommand(ret, LOGO_USER));
+   if (!strcmp(arg,  "capture")) return (ProcessCommand(ret, LOGO_CAPTURE));
+
+   return (INVALID_ARGUMENT);
+}
+
+int
+ExecMenuCommand(char ret[], const char *arg) {
+   if (!strcmp(arg,       "on")) return (ProcessCommand(ret, MENU_ON));
+   if (!strcmp(arg,      "off")) return (ProcessCommand(ret, MENU_OFF));
+   if (!strcmp(arg,    "clear")) return (ProcessCommand(ret, MENU_CLEAR));
+
+   return (INVALID_ARGUMENT);
+}
+
+int
+ExecPressCommand(char ret[], const char *arg) {
+   if (!strcmp(arg,    "right")) return (ProcessCommand(ret, PRESS_RIGHT));
+   if (!strcmp(arg,     "left")) return (ProcessCommand(ret, PRESS_LEFT));
+   if (!strcmp(arg,       "up")) return (ProcessCommand(ret, PRESS_UP));
+   if (!strcmp(arg,     "down")) return (ProcessCommand(ret, PRESS_DOWN));
+   if (!strcmp(arg,    "enter")) return (ProcessCommand(ret, PRESS_ENTER));
 
    return (INVALID_ARGUMENT);
 }
@@ -198,6 +229,14 @@ ExecColorCommand(char ret[], const char *arg) {
    if (!strcmp(arg,    "user2")) return (ProcessCommand(ret, COLOR_USER_2));
    if (!strcmp(arg,    "user3")) return (ProcessCommand(ret, COLOR_USER_3));
    if (!strcmp(arg,    "user4")) return (ProcessCommand(ret, COLOR_USER_4));
+
+   return (INVALID_ARGUMENT);
+}
+
+int
+ExecMuteCommand(char ret[], const char *arg) {
+   if (!strcmp(arg,       "on")) return (ProcessCommand(ret, MUTE_ON));
+   if (!strcmp(arg,      "off")) return (ProcessCommand(ret, MUTE_OFF));
 
    return (INVALID_ARGUMENT);
 }

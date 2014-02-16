@@ -11,8 +11,8 @@
 #define POWER_OFF_QUICK         "C01\r"
 #define POWER_OFF_ASK           "C02\r"
 
-#define VIDEO_MUTE_ON           "C0D\r"
-#define VIDEO_MUTE_OFF          "C0E\r"
+#define MUTE_ON                 "C0D\r"
+#define MUTE_OFF                "C0E\r"
 
 #define SCALE_NORMAL            "C0F\r"
 #define SCALE_FULL              "C10\r"

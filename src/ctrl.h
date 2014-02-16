@@ -24,6 +24,10 @@ int ExecInputCommand(char ret[], const char *arg);
 int ExecScalerCommand(char ret[], const char *arg);
 int ExecLampCommand(char ret[], const char *arg);
 int ExecColorCommand(char ret[], const char *arg);
+int ExecMuteCommand(char ret[], const char *arg);
+int ExecLogoCommand(char ret[], const char *arg);
+int ExecMenuCommand(char ret[], const char *arg);
+int ExecPressCommand(char ret[], const char *arg);
 int ExecGenericCommand(char ret[], const char *arg);
 
 #endif // _Z4CTRL_CTRL_H_

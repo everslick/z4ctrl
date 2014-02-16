@@ -26,18 +26,26 @@ event_callback(snl_socket_t *skt) {
       data = (char *)skt->data_buffer;
       data[skt->data_length] = '\0';
 
-      // FIXME potential buffer overflow
-      sscanf(data, "%s %s", cmd, arg);
+      // remove last command from buffers
+      memset(cmd, 0, 32);
+      memset(arg, 0, 32);
+
+      sscanf(data, "%31s %31s", cmd, arg);
 
       syslog(LOG_DEBUG, "received: %s %s", cmd, arg);
 
-      if (!strcmp(cmd,  "power")) err = ExecPowerCommand(ret, arg);
-      if (!strcmp(cmd,  "input")) err = ExecInputCommand(ret, arg);
-      if (!strcmp(cmd, "scaler")) err = ExecScalerCommand(ret, arg);
-      if (!strcmp(cmd,   "lamp")) err = ExecLampCommand(ret, arg);
-      if (!strcmp(cmd,  "color")) err = ExecColorCommand(ret, arg);
-      if (!strcmp(cmd, "status")) err = ExecStatusRead(ret, arg);
-      if (!strcmp(cmd,  "model")) err = ReadModelNumber(ret);
+      if (cmd[0] == 'C') err = ExecGenericCommand(ret, cmd);
+      else if (!strcmp(cmd,  "power")) err = ExecPowerCommand(ret, arg);
+      else if (!strcmp(cmd,  "input")) err = ExecInputCommand(ret, arg);
+      else if (!strcmp(cmd, "scaler")) err = ExecScalerCommand(ret, arg);
+      else if (!strcmp(cmd,   "lamp")) err = ExecLampCommand(ret, arg);
+      else if (!strcmp(cmd,  "color")) err = ExecColorCommand(ret, arg);
+      else if (!strcmp(cmd,   "menu")) err = ExecMenuCommand(ret, arg);
+      else if (!strcmp(cmd,   "mute")) err = ExecMuteCommand(ret, arg);
+      else if (!strcmp(cmd,  "press")) err = ExecPressCommand(ret, arg);
+      else if (!strcmp(cmd,   "logo")) err = ExecLogoCommand(ret, arg);
+      else if (!strcmp(cmd, "status")) err = ExecStatusRead(ret, arg);
+      else if (!strcmp(cmd,  "model")) err = ReadModelNumber(ret);
 
       switch (err) {
          case UNKNOWN_COMMAND:
