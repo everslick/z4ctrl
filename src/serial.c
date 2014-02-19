@@ -1,6 +1,5 @@
 #define _BSD_SOURCE // CRTSCTS
 
-#include <termios.h>
 #include <dirent.h>
 #include <string.h>
 #include <limits.h>
@@ -11,9 +10,8 @@
 
 #include "serial.h"
 
-static int fd = -1;
-
-static struct termios settings;
+// TODO check for NULL pointer
+// TODO check for serial->fd == -1
 
 int
 SerialListDevices(char *device[], unsigned int *number) {
@@ -43,47 +41,54 @@ SerialListDevices(char *device[], unsigned int *number) {
    return (SERIAL_OK);
 }
 
-int
+Serial *
 SerialOpen(const char *device) {
+   int fd = -1;
+
    // open port
    if ((fd = open(device, O_RDWR | O_NOCTTY)) < 0) {
-      return (SERIAL_ERR_OPEN);
+      return (NULL);
    }
 
-   return (0);
+	Serial *serial = malloc(sizeof (Serial));
+
+   memset(serial, 0, sizeof (Serial));
+   serial->fd = fd;
+
+   return (serial);
 }
 
 int
-SerialClose(void) {
-   close(fd);
+SerialClose(Serial *serial) {
+   close(serial->fd);
 
    return (SERIAL_OK);
 }
 
 int
-SerialFlush(void) {
-   tcflush(fd, TCIOFLUSH);
+SerialFlush(Serial *serial) {
+   tcflush(serial->fd, TCIOFLUSH);
 
    return (SERIAL_OK);
 }
 
 int
-SerialSetTimeout(int ms) {
+SerialSetTimeout(Serial *serial, int ms) {
    if (ms < 0) {
-      settings.c_cc[VMIN]  = 0;
-      settings.c_cc[VTIME] = 0;
+      serial->settings.c_cc[VMIN]  = 0;
+      serial->settings.c_cc[VTIME] = 0;
    } else {
-      settings.c_cc[VMIN]  = (ms) ? 0 : 1;
-      settings.c_cc[VTIME] = (ms + 99) / 100; // recalculate from ms to ds
+      serial->settings.c_cc[VMIN]  = (ms) ? 0 : 1;
+      serial->settings.c_cc[VTIME] = (ms + 99) / 100; // calc from ms to ds
    }
 
-   tcsetattr(fd, TCSANOW, &settings);
+   tcsetattr(serial->fd, TCSANOW, &serial->settings);
 
    return (SERIAL_OK);
 }
 
 int
-SerialInit(int baud, const char *format, int rtscts) {
+SerialInit(Serial *serial, int baud, const char *format, int rtscts) {
    int cflags = CLOCAL | CREAD;
 
    if ((!format) || (strlen(format) != 3)) {
@@ -133,22 +138,22 @@ SerialInit(int baud, const char *format, int rtscts) {
    }
 
    // clear struct and set port parameters
-   memset(&settings, 0, sizeof (settings));
-   settings.c_cflag = cflags;
-   settings.c_iflag = IGNPAR;
+   memset(&serial->settings, 0, sizeof (serial->settings));
+   serial->settings.c_cflag = cflags;
+   serial->settings.c_iflag = IGNPAR;
 
-   SerialSetTimeout(0);
-   SerialFlush();
+   SerialSetTimeout(serial, 0);
+   SerialFlush(serial);
 
    return (0);
 }
 
 int
-SerialSendBuffer(const void *buf, unsigned int len) {
+SerialSendBuffer(Serial *serial, const void *buf, unsigned int len) {
    int written;
 
    while (len > 0) {
-      written = write(fd, buf, len);
+      written = write(serial->fd, buf, len);
 
       if (written < 0) {
          if (errno == EINTR) continue;
@@ -164,14 +169,14 @@ SerialSendBuffer(const void *buf, unsigned int len) {
 }
 
 int
-SerialReceiveBuffer(void *buf, unsigned int *len, int timeout) {
+SerialReceiveBuffer(Serial *serial, void *buf, unsigned int *len, int timeout) {
    unsigned int length = 0;
    int received;
 
-   SerialSetTimeout(timeout);
+   SerialSetTimeout(serial, timeout);
 
    while (*len > 0) {
-      received = read(fd, buf, *len);
+      received = read(serial->fd, buf, *len);
 
       if (received > 0) length += received;
 

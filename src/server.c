@@ -5,7 +5,7 @@
 #include <signal.h>
 #include <stdio.h>
 
-#include "ctrl.h"
+#include "sanyo.h"
 #include "snl.h"
 
 static int shutdown = 0;

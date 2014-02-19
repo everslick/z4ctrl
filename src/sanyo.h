@@ -1,5 +1,5 @@
-#ifndef _Z4CTRL_CTRL_H_
-#define _Z4CTRL_CTRL_H_
+#ifndef _Z4CTRL_SANYO_H_
+#define _Z4CTRL_SANYO_H_
 
 #define UNKNOWN_COMMAND          1
 #define INVALID_ARGUMENT         2
@@ -10,7 +10,7 @@
 
 #define STRING_SIZE             32
 
-extern char *serial_device;
+extern char *sanyo_serial_device;
 
 int ReadPowerStatus(char ret[]);
 int ReadInputMode(char ret[]);
@@ -30,4 +30,4 @@ int ExecMenuCommand(char ret[], const char *arg);
 int ExecPressCommand(char ret[], const char *arg);
 int ExecGenericCommand(char ret[], const char *arg);
 
-#endif // _Z4CTRL_CTRL_H_
+#endif // _Z4CTRL_SANYO_H_

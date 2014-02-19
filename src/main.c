@@ -7,12 +7,12 @@
 
 #include "server.h"
 #include "serial.h"
-#include "ctrl.h"
+#include "sanyo.h"
 
 static void
 HelpUsage(void) {
    puts("");
-   puts("control client for Sanyo PLV-Z4 projector " VERSION " <clemens@1541.org>");
+   puts("sanyo projector control server " VERSION " <clemens@1541.org>");
    puts("");
    puts("USAGE: z4ctrl <command> <argument>");
    puts("");
@@ -30,7 +30,7 @@ HelpUsage(void) {
    puts("\tmenu   ... switch OSD menu on or off");
    puts("\tpress  ... emulate menu navigation buttons");
    puts("\tmodel  ... read model number");
-   puts("\tprobe  ... probe serial devices for connected projector and exit");
+   puts("\tprobe  ... probe serial devices for connected devices and exit");
    puts("\tserver ... fork to background and keep running as network service");
    puts("");
    puts("RETURN CODES:");
@@ -41,7 +41,7 @@ HelpUsage(void) {
    puts("\t3      ... serial open failed");
    puts("\t4      ... serial write error");
    puts("\t5      ... serial read timeout");
-   puts("\t6      ... projector not connected");
+   puts("\t6      ... no projector connected");
    puts("");
 
    exit(0);
@@ -216,20 +216,20 @@ main(int argc, char **argv) {
    SerialListDevices(dev_node, &dev_number);
 
    for (int i=0; i<dev_number; i++) {
-      serial_device = dev_node[i];
+      sanyo_serial_device = dev_node[i];
 
       if (!ReadPowerStatus(ret)) break;
 
-      serial_device = NULL;
+      sanyo_serial_device = NULL;
    }
 
-   if (!serial_device) {
+   if (!sanyo_serial_device) {
       puts("projector not connected, exiting!");
 
       exit(NOT_CONNECTED);
    }
 
-   printf("found projector on %s\n", serial_device);
+   printf("found projector on %s\n", sanyo_serial_device);
 
    if (!strcmp(argv[1], "probe")) {
       exit(err);

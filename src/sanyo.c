@@ -4,33 +4,34 @@
 
 #include "command.h"
 #include "serial.h"
-#include "ctrl.h"
+#include "sanyo.h"
 
-char *serial_device = NULL;
+char *sanyo_serial_device = NULL;
 
 static int
 ProcessCommand(char ret[], const char *cmd) {
+   Serial *serial = NULL;
    unsigned int len = 1;
    int err = 0;
 
-   if (SerialOpen(serial_device)) {
+   if ((serial = SerialOpen(sanyo_serial_device)) == NULL) {
       return (OPEN_FAILED);
    }
 
-   if (SerialInit(19200, "8N1", 0)) {
-      SerialClose();   
+   if (SerialInit(serial, 19200, "8N1", 0)) {
+      SerialClose(serial);   
       return (OPEN_FAILED);
    }
 
-   if (SerialSendBuffer(cmd, 4)) {
-      SerialClose();   
+   if (SerialSendBuffer(serial, cmd, 4)) {
+      SerialClose(serial);   
       return (WRITE_ERROR);
    }
 
    memset(ret, 0, STRING_SIZE);
 
    for (int i=0; i<STRING_SIZE; i++) {
-      if (SerialReceiveBuffer(&ret[i], &len, 3000)) {
+      if (SerialReceiveBuffer(serial, &ret[i], &len, 3000)) {
          // timeout, don't try to read more bytes
          err = READ_TIMEOUT; break;
       }
@@ -46,14 +47,14 @@ ProcessCommand(char ret[], const char *cmd) {
       }
 
       if (ret[i] == '\r') {
-         // received CR, replace by terminating \0r
+         // received CR, replace by terminating \0
          ret[i] = '\0';
          // ret complete, end loop
          break;
       }
    }
 
-   SerialClose();   
+   SerialClose(serial);
 
    return (err);
 }
