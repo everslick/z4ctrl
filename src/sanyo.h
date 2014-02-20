@@ -10,7 +10,11 @@
 
 #define STRING_SIZE             32
 
-extern char *sanyo_serial_device;
+#include "serial.h"
+
+extern Serial *sanyo_serial;
+
+int SanyoProbeDevice(const char *device);
 
 int ReadPowerStatus(char ret[]);
 int ReadInputMode(char ret[]);

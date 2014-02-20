@@ -14,6 +14,7 @@
 typedef struct Serial {
    int fd;
    struct termios settings;
+   const char *device;
 } Serial;
 
 int SerialListDevices(char *device[], unsigned int *number);

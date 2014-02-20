@@ -8,6 +8,7 @@
 #include "server.h"
 #include "serial.h"
 #include "sanyo.h"
+#include "onkyo.h"
 
 static void
 HelpUsage(void) {
@@ -162,7 +163,6 @@ HelpStartLogo(void) {
    exit(0);
 }
 
-
 static void
 HelpButtonPress(void) {
    puts("possible press commands are:");
@@ -177,13 +177,23 @@ HelpButtonPress(void) {
    exit(0);
 }
 
-
 static void
 HelpVideoMute(void) {
    puts("possible mute commands are:");
    puts("");
    puts("\ton       ... black out the image");
    puts("\toff      ... restore image");
+   puts("");
+
+   exit(0);
+}
+
+static void
+HelpOnkyoCommands(void) {
+   puts("possible onkyo commands are:");
+   puts("");
+   puts("\tpower    ... switch receiver on or off");
+   puts("\tmute     ... mute speaker");
    puts("");
 
    exit(0);
@@ -216,20 +226,20 @@ main(int argc, char **argv) {
    SerialListDevices(dev_node, &dev_number);
 
    for (int i=0; i<dev_number; i++) {
-      sanyo_serial_device = dev_node[i];
-
-      if (!ReadPowerStatus(ret)) break;
-
-      sanyo_serial_device = NULL;
+      if (!SanyoProbeDevice(dev_node[i])) break;
    }
 
-   if (!sanyo_serial_device) {
-      puts("projector not connected, exiting!");
-
-      exit(NOT_CONNECTED);
+   for (int i=0; i<dev_number; i++) {
+      if (!OnkyoProbeDevice(dev_node[i])) break;
    }
 
-   printf("found projector on %s\n", sanyo_serial_device);
+   if (sanyo_serial) {
+      printf("found Sanyo projector on %s\n", sanyo_serial->device);
+   }
+
+   if (onkyo_serial) {
+      printf("found Onkyo receiver on %s\n", onkyo_serial->device);
+   }
 
    if (!strcmp(argv[1], "probe")) {
       exit(err);
@@ -335,6 +345,14 @@ main(int argc, char **argv) {
       }   
    }
 
+   if (!strcmp(argv[1], "onkyo")) {
+      if ((argc<3) || (!strcmp(argv[2], "help"))) {
+         HelpOnkyoCommands();
+      } else {
+         err = OnkyoExecCommand(ret, argv[2]);
+      }   
+   }
+
    switch (err) {
       case UNKNOWN_COMMAND:
          printf("unknown command!\n");
@@ -354,6 +372,10 @@ main(int argc, char **argv) {
 
       case OPEN_FAILED:
          printf("serial device open failed!\n");
+      break;
+
+      case NOT_CONNECTED:
+         printf("device not connected!\n");
       break;
 
       default:

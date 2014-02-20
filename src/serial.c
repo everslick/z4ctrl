@@ -50,10 +50,11 @@ SerialOpen(const char *device) {
       return (NULL);
    }
 
-	Serial *serial = malloc(sizeof (Serial));
+   Serial *serial = malloc(sizeof (Serial));
 
    memset(serial, 0, sizeof (Serial));
    serial->fd = fd;
+   serial->device = device;
 
    return (serial);
 }
@@ -61,6 +62,8 @@ SerialOpen(const char *device) {
 int
 SerialClose(Serial *serial) {
    close(serial->fd);
+
+   free(serial);
 
    return (SERIAL_OK);
 }

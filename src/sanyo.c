@@ -6,32 +6,25 @@
 #include "serial.h"
 #include "sanyo.h"
 
-char *sanyo_serial_device = NULL;
+Serial *sanyo_serial = NULL;
 
 static int
 ProcessCommand(char ret[], const char *cmd) {
-   Serial *serial = NULL;
    unsigned int len = 1;
    int err = 0;
 
-   if ((serial = SerialOpen(sanyo_serial_device)) == NULL) {
-      return (OPEN_FAILED);
-   }
+   if (!sanyo_serial) return (0);
 
-   if (SerialInit(serial, 19200, "8N1", 0)) {
-      SerialClose(serial);   
-      return (OPEN_FAILED);
-   }
-
-   if (SerialSendBuffer(serial, cmd, 4)) {
-      SerialClose(serial);   
+   if (SerialSendBuffer(sanyo_serial, cmd, 4)) {
+      SerialClose(sanyo_serial);   
+      sanyo_serial = NULL;
       return (WRITE_ERROR);
    }
 
    memset(ret, 0, STRING_SIZE);
 
    for (int i=0; i<STRING_SIZE; i++) {
-      if (SerialReceiveBuffer(serial, &ret[i], &len, 3000)) {
+      if (SerialReceiveBuffer(sanyo_serial, &ret[i], &len, 3000)) {
          // timeout, don't try to read more bytes
          err = READ_TIMEOUT; break;
       }
@@ -54,9 +47,30 @@ ProcessCommand(char ret[], const char *cmd) {
       }
    }
 
-   SerialClose(serial);
-
    return (err);
+}
+
+int
+SanyoProbeDevice(const char *device) {
+   char ret[STRING_SIZE];
+
+   if ((sanyo_serial = SerialOpen(device)) == NULL) {
+      return (OPEN_FAILED);
+   }
+
+   if (SerialInit(sanyo_serial, 19200, "8N1", 0)) {
+      SerialClose(sanyo_serial);
+      sanyo_serial = NULL;
+      return (OPEN_FAILED);
+   }
+
+   if (ReadPowerStatus(ret)) {
+      SerialClose(sanyo_serial);
+      sanyo_serial = NULL;
+      return (NOT_CONNECTED);
+   }
+
+   return (0);
 }
 
 int

@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #include "sanyo.h"
+#include "onkyo.h"
 #include "snl.h"
 
 static int shutdown = 0;
@@ -30,6 +31,8 @@ event_callback(snl_socket_t *skt) {
       memset(cmd, 0, 32);
       memset(arg, 0, 32);
 
+      memset(ret, 0, STRING_SIZE);
+
       sscanf(data, "%31s %31s", cmd, arg);
 
       syslog(LOG_DEBUG, "received: %s %s", cmd, arg);
@@ -46,6 +49,7 @@ event_callback(snl_socket_t *skt) {
       else if (!strcmp(cmd,   "logo")) err = ExecLogoCommand(ret, arg);
       else if (!strcmp(cmd, "status")) err = ExecStatusRead(ret, arg);
       else if (!strcmp(cmd,  "model")) err = ReadModelNumber(ret);
+      else if (!strcmp(cmd,  "onkyo")) err = OnkyoExecCommand(ret, arg);
 
       switch (err) {
          case UNKNOWN_COMMAND:
