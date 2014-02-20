@@ -92,6 +92,8 @@ OnkyoExecCommand(char ret[], const char *arg) {
    if (!strcmp(arg,     "vol+")) return (ProcessCommand(ret,    "vol+\n"));
    if (!strcmp(arg,     "vol-")) return (ProcessCommand(ret,    "vol-\n"));
    if (!strcmp(arg,     "mute")) return (ProcessCommand(ret,    "mute\n"));
+   if (!strcmp(arg,     "xbox")) return (ProcessCommand(ret,    "xbox\n"));
+   if (!strcmp(arg,      "ps2")) return (ProcessCommand(ret,     "ps2\n"));
    if (!strcmp(arg,  "speaker")) return (ProcessCommand(ret, "speaker\n"));
    if (!strcmp(arg,    "movie")) return (ProcessCommand(ret,   "movie\n"));
    if (!strcmp(arg,     "game")) return (ProcessCommand(ret,    "game\n"));

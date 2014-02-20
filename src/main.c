@@ -194,6 +194,16 @@ HelpOnkyoCommands(void) {
    puts("");
    puts("\tpower    ... switch receiver on or off");
    puts("\tmute     ... mute speaker");
+   puts("\tvol+     ... volume up");
+   puts("\tvol-     ... volume down");
+   puts("\txbox     ... select xbmc as audio/video source");
+   puts("\tps2      ... select playstation as audio source");
+   puts("\tspeaker  ... rotate speaker outputs: a -> a/b -> b -> none");
+   puts("\tmovie    ... select audio precessor for movies");
+   puts("\tgame     ... select audio program for games");
+   puts("\tmusic    ... select audio processing for music");
+   puts("\tstereo   ... select stereo program");
+   puts("\tstatus   ... test if Arduino is responding");
    puts("");
 
    exit(0);
@@ -221,6 +231,7 @@ main(int argc, char **argv) {
       if (!strcmp(argv[2],   "logo")) HelpStartLogo();
       if (!strcmp(argv[2],   "menu")) HelpOsdMenu();
       if (!strcmp(argv[2],  "press")) HelpButtonPress();
+      if (!strcmp(argv[2],  "onkyo")) HelpOnkyoCommands();
    }
 
    SerialListDevices(dev_node, &dev_number);
